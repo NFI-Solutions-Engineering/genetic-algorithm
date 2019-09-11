@@ -1,4 +1,3 @@
-from genetic_algorithm import environment as env
 from genetic_algorithm import algorithms as algs
 import unittest
 import pandas as pd
@@ -16,24 +15,28 @@ class BasicVRPGACase(unittest.TestCase):
     demand_data = pd.read_csv(filepath) # rows for demand to route
     n = len(demand_data)
     initial_route_ids = np.random.randint(0, n-1, n) # each index maps to same position in demand
+    n_generations = 10
     population_size = 10
 
     def setUp(self):
-        self.routes = env.Individual(self.initial_route_ids, self.demand_data)
         self.algorithm = algs.BasicGeneticAlgorithm(
-            self.routes, self.fitness_func, pop_size=self.population_size)
+            first_individual=self.initial_route_ids,
+            environment=self.demand_data,
+            fitness_func=self.fitness_func,
+            n_generations=self.n_generations,
+            population_size=self.population_size)
 
     def tearDown(self):
         pass
 
-    def fitness_func(self, individual):
+    def fitness_func(self, individual, environment):
         """Return a fitness score for an individual. Lower scores rank
         higher."""
 
         def decode():
             """return individual represented with demand_data"""
-            data = self.decoded.copy()
-            data['chromosomes'] = individual.chromosomes
+            data = environment.copy()
+            data['chromosomes'] = individual
             return data
 
         decoded = decode()
@@ -44,15 +47,18 @@ class BasicVRPGACase(unittest.TestCase):
         max_distance = 50*2 # represent a total day of driving
 
         def calculate_distances(geocodes):
-            return haversine(
-                geocodes.prev_lat, geocodes.prev_lon, geocodes.latitude,
-                geocodes.longitude, unit=Unit.MILES)
+            return haversine((geocodes.prev_lat, geocodes.prev_lon),
+                (geocodes.latitude, geocodes.longitude), unit=Unit.MILES)
 
-        # count the number of penalties
+        # tally penalties (dif from maxing out capacity + minimizing distance)
         weight_penalty = (
-            decoded.groupby('chromosomes')['Weight'].sum() > max_weight).sum()
+            max_weight - decoded.groupby('chromosomes')['Weight'].sum()
+            ).abs().sum()
+
         pallet_penalty = (
-            decoded.groupby('chromosomes')['Plts'].sum() > max_pallets).sum()
+            max_pallets - decoded.groupby('chromosomes')['Plts'].sum()
+            ).abs().sum()
+
         distance_penalty = 0
         for chrom in decoded.chromosomes.unique():
             cols = ['latitude', 'longitude']
@@ -60,7 +66,7 @@ class BasicVRPGACase(unittest.TestCase):
             stops['prev_lat'] = stops.latitude.shift()
             stops['prev_lon'] = stops.longitude.shift()
             distances = stops.apply(lambda x: calculate_distances(x), axis=1)
-            distance_penalty += (distance > max_distance).sum()
+            distance_penalty += distances.sum()
 
         return weight_penalty + pallet_penalty + distance_penalty
 
