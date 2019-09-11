@@ -4,3 +4,12 @@ class BasicGeneticAlgorithm:
         function."""
         self.pop = population
         self.fit = fitness
+
+    def select(self):
+        pass
+
+    def crossover(self):
+        pass
+
+    def mutate(self):
+        pass
