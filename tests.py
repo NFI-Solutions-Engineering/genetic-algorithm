@@ -1,14 +1,23 @@
-import genetic_algorithm as ga
+from genetic_algorithm import environment as env
+from genetic_algorithm import algorithms as algs
 import unittest
 
 
-class GeneticAlgorithmCase(unittest.TestCase):
+class BasicGeneticAlgorithmCase(unittest.TestCase):
     def setUp(self):
-        self.routes = ga.Individual() # example usage: VRP
-        self.alg = ga.GeneticAlgorithm(self.routes, self.fitness_function)
+        self.routes = env.Individual() # example usage: VRP
+        self.alg = algs.BasicGeneticAlgorithm(
+            self.routes, self.fitness_function)
 
-    def fitness_function(self):
+    def tearDown(self):
         pass
 
-if __file__ == '__main__':
+    def fitness_function(self):
+        test = True
+        return test
+
+    def test_fitness(self):
+        self.assertTrue(self.alg.fit())
+
+if __name__ == '__main__':
     unittest.main(verbosity=2)
