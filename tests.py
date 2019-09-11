@@ -7,7 +7,7 @@ class BasicGeneticAlgorithmCase(unittest.TestCase):
     def setUp(self):
         self.routes = env.Individual() # example usage: VRP
         self.alg = algs.BasicGeneticAlgorithm(
-            self.routes, self.fitness_function)
+            self.routes, self.fitnes_func)
 
     def tearDown(self):
         pass

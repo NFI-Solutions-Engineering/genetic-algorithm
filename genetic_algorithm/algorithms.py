@@ -1,9 +1,9 @@
 class BasicGeneticAlgorithm:
-    def __init__(self, population, fitness):
+    def __init__(self, population, fitness_func):
         """returns optimized solution based off population and fitness
         function."""
-        self.pop = population
-        self.fit = fitness
+        self.population = population
+        self.fitness_func = fitness
 
     def select(self):
         pass
