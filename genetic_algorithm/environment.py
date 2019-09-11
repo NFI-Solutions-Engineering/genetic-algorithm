@@ -5,6 +5,3 @@ class Individual:
         evaluation"""
         self.chromosomes = chromosomes
         self.decoded = decoded
-
-class Population(Individual):
-    pass
