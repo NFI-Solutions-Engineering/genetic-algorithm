@@ -3,7 +3,7 @@ class BasicGeneticAlgorithm:
         """returns optimized solution based off population and fitness
         function."""
         self.population = population
-        self.fitness_func = fitness
+        self.fitness_func = fitness_func
 
     def select(self):
         pass
