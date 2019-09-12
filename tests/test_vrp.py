@@ -13,7 +13,7 @@ instance_dir = path.join(root_dir, 'instance')
 # user-defined parameters
 filepath = path.join(instance_dir, 'demand.csv')
 demand_data = pd.read_csv(filepath) # data to use for solve
-n_generations = 10
+n_generations = 50
 population_size = 10
 
 # each index position of the first individual maps to same position in
