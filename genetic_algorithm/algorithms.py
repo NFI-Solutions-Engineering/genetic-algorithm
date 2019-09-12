@@ -2,7 +2,7 @@ import numpy as np
 
 class BasicGeneticAlgorithm:
     def __init__(self, first_individual, environment, fitness_func,
-        population_size, n_generations, selection_depreciation=0.5,
+        population_size=10, n_generations=100, selection_depreciation=0.5,
         crossover_rate=0.7, crossover_percent=0.5, mutation_rate=0.05):
         """Returns optimized solution based off initial individual and fitness
         function."""
@@ -24,11 +24,14 @@ class BasicGeneticAlgorithm:
         pool = first_individual
         return np.random.choice(pool, (size, len(pool)))
 
-    def select(self):
+    def assess(self):
         scores = [-self.fitness_func(individual, self.environment)
             for individual in self.population]
         ranking = np.argsort(scores)
-        new_population = [self.population[i] for i in ranking]
+        return [self.population[i] for i in ranking]
+
+    def select(self):
+        new_population = self.assess()
         reverse = np.arange(self.population_size, 0, -1)
         weights = np.power(reverse, self.selection_depreciation)
         probabilities = [weight/sum(weights) for weight in weights]
@@ -66,4 +69,4 @@ class BasicGeneticAlgorithm:
             self.select()
             self.crossover()
             self.mutate()
-        return self.population
+        return self.assess()[0]
