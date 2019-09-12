@@ -12,7 +12,7 @@ instance_dir = path.join(root_dir, 'instance')
 # user-defined parameters
 filepath = path.join(instance_dir, 'demand.csv')
 demand_data = pd.read_csv(filepath) # data to use for solve
-n_generations = 100
+n_generations = 10
 population_size = 10
 
 # each index position of the first individual maps to same position in
@@ -50,14 +50,18 @@ def fitness_func(individual, environment):
         max_pallets - decoded.groupby('chromosomes')['Plts'].sum()
         ).abs().sum()
 
-    distance_penalty = 0
-    for chrom in decoded.chromosomes.unique():
-        cols = ['latitude', 'longitude']
-        stops = decoded.loc[decoded.chromosomes == chrom, cols].copy()
-        stops['prev_lat'] = stops.latitude.shift()
-        stops['prev_lon'] = stops.longitude.shift()
-        distances = stops.apply(lambda x: calculate_distances(x), axis=1)
-        distance_penalty += distances.sum()
+    def get_distance_penalty():
+        distance_penalty = 0
+        for chrom in decoded.chromosomes.unique():
+            cols = ['latitude', 'longitude']
+            stops = decoded.loc[decoded.chromosomes == chrom, cols].copy()
+            stops['prev_lat'] = stops.latitude.shift()
+            stops['prev_lon'] = stops.longitude.shift()
+            distances = stops.apply(lambda x: calculate_distances(x), axis=1)
+            distance_penalty += distances.sum()
+        return distance_penalty
+
+    distance_penalty = get_distance_penalty()
 
     return weight_penalty + pallet_penalty + distance_penalty
 
