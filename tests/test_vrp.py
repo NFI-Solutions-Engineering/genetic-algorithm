@@ -13,7 +13,7 @@ instance_dir = path.join(root_dir, 'instance')
 # user-defined parameters
 filepath = path.join(instance_dir, 'demand.csv')
 demand_data = pd.read_csv(filepath) # data to use for solve
-n_generations = 50
+n_generations = 1000
 population_size = 10
 
 # each index position of the first individual maps to same position in
@@ -67,7 +67,6 @@ def fitness_func(individual, environment):
         return decoded.distance.sum()
 
     distance_penalty = get_distance_penalty()
-
     return weight_penalty + pallet_penalty + distance_penalty
 
 # set up individuals' environment with dataframe for the solve and
@@ -107,9 +106,10 @@ algorithm = algs.BasicGeneticAlgorithm(
 
 
 def test_algorithm():
-    population = algorithm.run()
-    i = random.randint(0, population_size)
-    assert len(population[i]) == len(demand_data)
+    result = algorithm.run()
+    assert len(result) == len(demand_data)
+    demand_data['truck_id'] = result
+    demand_data.to_csv(path.join(instance_dir, 'result.csv'), index=False)
 
 if __name__ == '__main__':
     test_algorithm()
